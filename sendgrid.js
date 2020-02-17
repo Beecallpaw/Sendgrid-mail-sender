@@ -2,7 +2,7 @@ const sendgrid = require('@sendgrid/mail')
 const data = require('./index')
 sendgrid.setApiKey(process.env.SENDGRID_API_KEY)
 const R = require('ramda')
-const fs = require('fs');
+const fs = require('fs')
 
 const x = data.map(obj => {
   const name = obj.name
@@ -51,10 +51,10 @@ msg.map(message => {
       await sendgrid.send(message);
       fs.appendFile('file.txt', `success : ${message.to}\n`, err => {
         if (err) throw err;
-        console.log('written to file');
+        console.log('written to file')
       })
     } catch (err) {
-      console.error(err.toString());
+      console.error(err.toString())
     }
-  })();
+  })()
 })

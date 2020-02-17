@@ -1,21 +1,10 @@
-// import parseXlsx from 'excel';
-
 const XLSX = require('xlsx')
-const workbook = XLSX.readFile('/home/bee/activities.xlsx')
+const workbook = XLSX.readFile('./activities.xlsx')
 const sheets = workbook.SheetNames
 const emailJson = require('./user')
 const R = require('ramda')
-const log = x => console.log(x)
 
 const sheetsJson = XLSX.utils.sheet_to_json(workbook.Sheets[sheets[0]])
-
-const groupBy = key => array =>
-  array.reduce((objectsByKeyValue, obj) => {
-    const value = obj[key];
-    objectsByKeyValue[value] = (objectsByKeyValue[value] || []).concat(obj);
-    return objectsByKeyValue;
-  }, {});
-
 
 const xlsJson = sheetsJson.map(function (data) {
   return {
@@ -25,7 +14,7 @@ const xlsJson = sheetsJson.map(function (data) {
   }
 });
 
-groupByOrgId = R.groupBy(obj => obj.org_id)
+const groupByOrgId = R.groupBy(obj => obj.org_id)
 
 const orgIdGroup = groupByOrgId(xlsJson)
 
@@ -61,7 +50,6 @@ const formattedEmailData = formatEmailData(orgIdEmail)
 const groupedByOrgId = R.groupBy(R.prop('org_id'), formattedData)
 const finalData = R.map(data => R.merge(data, groupedByOrgId[data.org_id][0]), formattedEmailData)
 
-module.exports = finalData;
-
+module.exports = finalData
 
 
