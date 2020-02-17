@@ -3,8 +3,9 @@
 const XLSX = require('xlsx')
 const workbook = XLSX.readFile('/home/bee/activities.xlsx')
 const sheets = workbook.SheetNames
-const emailJson = require('../../user')
+const emailJson = require('./user')
 const R = require('ramda')
+const log = x => console.log(x)
 
 const sheetsJson = XLSX.utils.sheet_to_json(workbook.Sheets[sheets[0]])
 
@@ -24,13 +25,11 @@ const xlsJson = sheetsJson.map(function (data) {
   }
 });
 
-const log = x => console.log(x)
+groupByOrgId = R.groupBy(obj => obj.org_id)
 
-const groupByOrgId = groupBy('org_id')
 const orgIdGroup = groupByOrgId(xlsJson)
 
-const getEmail = groupBy('org_id')
-const orgIdEmail = getEmail(emailJson)
+const orgIdEmail = groupByOrgId(emailJson)
 
 const reduceXlsData = arr => arr.reduce((acc, obj) =>
   ({

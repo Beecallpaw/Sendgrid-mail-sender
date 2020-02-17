@@ -2,18 +2,19 @@ const sendgrid = require('@sendgrid/mail')
 const data = require('./index')
 sendgrid.setApiKey(process.env.SENDGRID_API_KEY)
 const R = require('ramda')
+const fs = require('fs');
 
 const x = data.map(obj => {
-    const name = obj.name
-    const activities = obj.act_id.map(id => `<li><a href="https://aidstream.org/activity/${id}">https://aidstream.org/activity/${id}</a></li>`).join('')
+  const name = obj.name
+  const activities = obj.act_id.map(id => `<li><a href="https://aidstream.org/activity/${id}">https://aidstream.org/activity/${id}</a></li>`).join('')
 
-    return  obj.email.map(email => {
-        return {
-            to: email,
-            from: 'support@aidstream.org',
-            subject: "Need republishing - Some of your published activities use IATI Standard V1 in the XML",
-            text: "Need republishing - Some of your published activities use IATI Standard V1 in the XML",
-            html: `<p>Dear ${name},</p>
+  return obj.email.map(email => {
+    return {
+      to: email,
+      from: 'support@aidstream.org',
+      subject: "Need republishing - Some of your published activities use IATI Standard V1 in the XML",
+      text: "Need republishing - Some of your published activities use IATI Standard V1 in the XML",
+      html: `<p>Dear ${name},</p>
 
         <p>Greetings from AidStream.<p>
 
@@ -37,21 +38,23 @@ const x = data.map(obj => {
         <p>Best regards,</p>
 
         <p>AidStream Team</p>`
-        }
-    })
+    }
+  })
 })
 
 
 const msg = R.unnest(x)
 
-// sendgrid.send(msg).then(response => console.log(response.json())).catch(err => console.log(err))
 msg.map(message => {
-    (async () => {
-      try {
-        await sendgrid.send(message);
-        console.log('success', message.to)
-      } catch (err) {
-        console.error(err.toString());
-      }
-    })();
+  (async () => {
+    try {
+      await sendgrid.send(message);
+      fs.appendFile('file.txt', `success : ${message.to}\n`, err => {
+        if (err) throw err;
+        console.log('written to file');
+      })
+    } catch (err) {
+      console.error(err.toString());
+    }
+  })();
 })
